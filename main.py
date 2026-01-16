@@ -21,8 +21,8 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 # Configurações de Moedas (Pares separados por vírgula e limites correspondentes)
 # Exemplo: USD-BRL,EUR-BRL
 CURRENCY_PAIRS = os.getenv("CURRENCY_PAIRS", "USD-BRL,EUR-BRL").split(",")
-# Exemplo: 5.20,5.80
-THRESHOLD_VALUES = [float(v) for v in os.getenv("THRESHOLD_VALUES", "5.20,6.00").split(",")]
+# Exemplo: 5.25,6.05
+THRESHOLD_VALUES = [float(v) for v in os.getenv("THRESHOLD_VALUES", "5.25,6.05").split(",")]
 
 def get_exchange_rates():
     try:
@@ -46,7 +46,7 @@ def send_email(alerts):
     for alert in alerts:
         body += (f"- {alert['name']}\n"
                  f"  Valor Atual: R$ {alert['rate']:.4f}\n"
-                 f"  Seu Limite: R$ {alert['threshold']:.4f}\n\n")
+                 f"  Minimo Definido: R$ {alert['threshold']:.4f}\n\n")
     
     body += f"Data/Hora: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}\n"
     body += "Este é um aviso automático do Bot de Câmbio."

@@ -59,13 +59,3 @@ A Vercel permite rodar scripts via "Cron Jobs" (tarefas agendadas).
 3. O arquivo `vercel.json` já configurou o caminho `/api/check` para rodar às 10:00 e 16:00 (horário UTC).
    *Nota: O horário da Vercel é UTC. 10:00 UTC é 07:00 no Brasil (Brasília).*
 
----
-
-## 4. Resumo das Variáveis no `.env`
-| Variável | Exemplo | Descrição |
-| :--- | :--- | :--- |
-| `CURRENCY_PAIRS` | `USD-BRL,EUR-BRL` | Moedas para monitorar |
-| `THRESHOLD_VALUES` | `5.20,5.80` | Preços limites (na mesma ordem) |
-| `EMAIL_SENDER` | `seu@gmail.com` | Seu e-mail de envio |
-| `EMAIL_PASSWORD` | `xxxx xxxx xxxx xxxx` | Senha de App do Google |
-| `EMAIL_RECEIVER` | `seu@gmail.com` | E-mail que recebe o alerta |

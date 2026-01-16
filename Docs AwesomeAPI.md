@@ -4,9 +4,6 @@
 
 ---
 
-Ctrl
-K
-GitHub
 Bem-vindo!
 ⚠️
 Aviso sobre limites
