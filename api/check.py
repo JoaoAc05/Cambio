@@ -12,47 +12,52 @@ def log(message ):
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # 1. Configurações
-        pairs_raw = os.getenv("CURRENCY_PAIRS", "USD-BRL,EUR-BRL")
-        thresholds_raw = os.getenv("THRESHOLD_VALUES", "5.20,6.00")
+        # Configurações
+        api_key = os.getenv("EXCHANGE_RATE_API_KEY", "6f8c8e8e8e8e8e8e8e8e8e8e") # Use a sua chave aqui
+        threshold_usd = float(os.getenv("THRESHOLD_USD", "5.20"))
+        threshold_eur = float(os.getenv("THRESHOLD_EUR", "6.00"))
         
-        pairs = pairs_raw.split(",")
-        thresholds = [float(v) for v in thresholds_raw.split(",")]
+        alerts = []
         
-        # 2. Consulta API
-        url = f"https://economia.awesomeapi.com.br/last/{pairs_raw}"
-        log(f"Consultando: {url}" )
+        # Consulta Dólar e Euro (Base USD para facilitar)
+        url = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/USD"
         
         try:
+            log(f"Consultando nova API..." )
             response = requests.get(url, timeout=15)
+            
             if response.status_code == 200:
                 data = response.json()
-                alerts = []
+                rates = data.get("conversion_rates", {})
                 
-                for i, pair in enumerate(pairs):
-                    key = pair.replace("-", "")
-                    threshold = thresholds[i] if i < len(thresholds) else thresholds[-1]
-                    
-                    if key in data:
-                        rate = float(data[key]["bid"])
-                        name = data[key]["name"]
-                        log(f"{name}: {rate} (Limite: {threshold})")
-                        if rate <= threshold:
-                            alerts.append({'name': name, 'rate': rate, 'threshold': threshold})
+                # Valor do Dólar em BRL
+                usd_brl = rates.get("BRL")
+                if usd_brl:
+                    log(f"USD-BRL: {usd_brl}")
+                    if usd_brl <= threshold_usd:
+                        alerts.append({'name': 'Dólar Americano', 'rate': usd_brl, 'threshold': threshold_usd})
                 
-                # 3. Envio de E-mail
+                # Valor do Euro em BRL (Calculado via paridade se necessário, ou consulta direta)
+                # Para ser mais preciso, consultamos o Euro também
+                url_eur = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/EUR"
+                response_eur = requests.get(url_eur, timeout=15 )
+                if response_eur.status_code == 200:
+                    eur_brl = response_eur.json().get("conversion_rates", {}).get("BRL")
+                    log(f"EUR-BRL: {eur_brl}")
+                    if eur_brl and eur_brl <= threshold_eur:
+                        alerts.append({'name': 'Euro', 'rate': eur_brl, 'threshold': threshold_eur})
+
                 if alerts:
                     self.send_alert_email(alerts)
-                    res_msg = f"Sucesso! Alerta enviado para {len(alerts)} moedas."
+                    res_msg = f"Alerta enviado para {len(alerts)} moedas."
                 else:
-                    res_msg = "Consulta OK. Nenhuma moeda abaixo do limite."
+                    res_msg = "Cotações verificadas. Valores acima do limite."
             else:
-                res_msg = f"Erro na API: Status {response.status_code}"
+                res_msg = f"Erro na nova API: Status {response.status_code}. Verifique sua API Key."
                 
         except Exception as e:
-            res_msg = f"Erro no processamento: {str(e)}"
+            res_msg = f"Erro: {str(e)}"
 
-        log(res_msg)
         self.send_response(200)
         self.send_header('Content-type', 'text/plain; charset=utf-8')
         self.end_headers()
@@ -62,24 +67,17 @@ class handler(BaseHTTPRequestHandler):
         sender = os.getenv("EMAIL_SENDER")
         password = os.getenv("EMAIL_PASSWORD")
         receiver = os.getenv("EMAIL_RECEIVER")
-        
         msg = MIMEMultipart()
         msg['From'] = sender
         msg['To'] = receiver
-        msg['Subject'] = "Alerta de Cambio: Oportunidade de Compra!"
-        
-        body = "As seguintes moedas atingiram o valor desejado:\n\n"
-        for a in alerts:
-            body += f"- {a['name']}: R$ {a['rate']:.4f} (Seu limite: R$ {a['threshold']:.4f})\n"
-        
+        msg['Subject'] = "Alerta de Cambio: Oportunidade!"
+        body = "Moedas em baixa:\n\n" + "\n".join([f"- {a['name']}: R$ {a['rate']:.4f}" for a in alerts])
         msg.attach(MIMEText(body, 'plain'))
-        
         try:
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
             server.login(sender, password)
             server.send_message(msg)
             server.quit()
-            log("E-mail enviado!")
         except Exception as e:
-            log(f"Falha ao enviar e-mail: {e}")
+            log(f"Erro e-mail: {e}")
