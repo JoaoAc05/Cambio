@@ -22,7 +22,7 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 # Exemplo: USD-BRL,EUR-BRL
 CURRENCY_PAIRS = os.getenv("CURRENCY_PAIRS", "USD-BRL,EUR-BRL").split(",")
 # Exemplo: 5.25,6.05
-THRESHOLD_VALUES = [float(v) for v in os.getenv("THRESHOLD_VALUES", "5.25,6.05").split(",")]
+THRESHOLD_VALUES = [float(v) for v in os.getenv("THRESHOLD_VALUES", "5.20,6.00").split(",")]
 
 def get_exchange_rates():
     try:
