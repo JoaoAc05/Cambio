@@ -13,7 +13,7 @@ def log(message ):
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         # Configurações
-        api_key = os.getenv("EXCHANGE_RATE_API_KEY", "6f8c8e8e8e8e8e8e8e8e8e8e") # Use a sua chave aqui
+        api_key = os.getenv("EXCHANGE_RATE_API_KEY", "61471d6335fab5571e8994864f342cda339da59144c361b825ba0ff12b941f90") # Use a sua chave aqui
         threshold_usd = float(os.getenv("THRESHOLD_USD", "5.20"))
         threshold_eur = float(os.getenv("THRESHOLD_EUR", "6.00"))
         
