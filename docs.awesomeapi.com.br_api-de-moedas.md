@@ -4,6 +4,10 @@
 
 ---
 
+AwesomeAPI
+Ctrl
+K
+GitHub
 Bem-vindo!
 ⚠️
 Aviso sobre limites
@@ -20,9 +24,6 @@ Retorna cotações sequenciais de uma única moeda (intervalo de 1 minuto)
 Retorna cotações sequenciais de um período específico (intervalo de 1 minuto)
 Formato de resposta
 Legendas
-
-Was this helpful?
-
 Copy
 API de Cotações
 
@@ -494,3 +495,6 @@ Código da moeda ex.: USD-BRL
 string
 
 Número de resultados para retornar. (Padrão 1. *Máximo 100/1500)
+
+Query Parameters
+Name
