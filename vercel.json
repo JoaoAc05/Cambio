@@ -1,9 +1,6 @@
 {
-  "rewrites": [
-    { "source": "/api/check", "destination": "/api/check.py" }
-  ],
   "crons": [{
-    "path": "/api/check",
+    "path": "/api/cron",
     "schedule": "0 10 * * *"
   }]
 }
