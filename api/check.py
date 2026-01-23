@@ -12,7 +12,7 @@ load_dotenv()
 AWESOME_API_KEY = os.environ.get("KEY_AWESOMEAPI")
 EMAIL_USER = os.environ.get("EMAIL_USER")
 EMAIL_PASS = os.environ.get("EMAIL_PASS")
-EMAIL_TARGET = EMAIL_USER # O mesmo que envia recebe
+EMAIL_TARGET = EMAIL_USER
 
 LIMIT_USD = 5.20
 LIMIT_EUR = 6.00
@@ -100,11 +100,18 @@ def handler(request):
     
     if usd is None or eur is None:
         usd, eur = get_exchange_rates_fallback()
+
+    response = {
+        "usd": usd,
+        "eur": eur,
+        "email_sent": False
+    }
         
     if usd is not None and eur is not None:
         print(f"Cotações obtidas - USD: {usd}, EUR: {eur}")
         if usd < LIMIT_USD and eur < LIMIT_EUR:
             send_email(usd, eur)
+            response["email_sent"] = True
         else:
             print("Valores acima do limite.")
     else:
@@ -112,7 +119,8 @@ def handler(request):
 
     return {
         "statusCode": 200,
-        "body": "Execução concluída."
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(response)
     }
 
 if __name__ == "__main__":
