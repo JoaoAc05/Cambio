@@ -4,7 +4,7 @@ Este bot monitora as cotações do Dólar e Euro e envia um alerta por e-mail ca
 
 ## Estrutura do Projeto
 
-- `api/check-exchange.py`: Script principal que realiza a consulta e envia o e-mail.
+- `api/check.py`: Script principal que realiza a consulta e envia o e-mail.
 - `vercel.json`: Configuração para deploy na Vercel e agendamento do Cron Job.
 - `requirements.txt`: Dependências do projeto.
 
@@ -24,10 +24,11 @@ pip install -r requirements.txt
 Para que o bot consiga enviar e-mails, você deve configurar as seguintes variáveis no seu sistema ou em um arquivo `.env`:
 - `EMAIL_USER`: Seu endereço de e-mail.
 - `EMAIL_PASS`: Sua senha de aplicativo (No Gmail, use "Senhas de App").
+- `KEY_AWESOMEAPI`: Sua senha de api da AwesomeApi.
 
 ### 4. Execução Manual
 ```bash
-python api/check-exchange.py
+python api/check.py
 ```
 
 ## Deploy na Vercel
