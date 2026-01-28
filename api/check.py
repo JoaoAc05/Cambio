@@ -21,10 +21,10 @@ LIMIT_EUR = 6.00
 
 def get_exchange_rates_awesome():
     if not AWESOME_API_KEY:
-        print("AWESOME_API_KEY não configurada.")
+        print("[WARN] AWESOME_API_KEY não configurada.")
         return None, None
 
-    print("Tentando AwesomeAPI...")
+    print("[INFO] Tentando AwesomeAPI...")
     url = f"https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL?token={AWESOME_API_KEY}"
     try:
         response = requests.get(url, timeout=10)
@@ -34,11 +34,11 @@ def get_exchange_rates_awesome():
         eur = float(data['EURBRL']['bid'])
         return usd, eur
     except Exception as e:
-        print(f"Erro na AwesomeAPI: {e}")
+        print(f"[WARN] Erro na AwesomeAPI: {e}")
         return None, None
 
 def get_exchange_rates_fallback():
-    print("Tentando Fallback (Frankfurter API)...")
+    print("[INFO] Tentando Fallback (Frankfurter API)...")
     url = "https://api.frankfurter.app/latest?from=USD,EUR&to=BRL"
     try:
         response = requests.get(url, timeout=10)
@@ -59,12 +59,12 @@ def get_exchange_rates_fallback():
         
         return float(usd), float(eur)
     except Exception as e:
-        print(f"Erro no Fallback: {e}")
+        print(f"[WARN] Erro no Fallback: {e}")
         return None, None
 
 def send_email(usd, eur):
     if not EMAIL_USER or not EMAIL_PASS:
-        print("Credenciais de e-mail não configuradas. Pulando envio.")
+        print("[WARN] Credenciais de e-mail não configuradas. Pulando envio.")
         return
 
     subject = "❗ALERTA: Câmbio abaixo do limite❗"
@@ -92,9 +92,9 @@ def send_email(usd, eur):
         server.login(EMAIL_USER, EMAIL_PASS)
         server.send_message(msg)
         server.quit()
-        print("E-mail enviado com sucesso!")
+        print("[INFO] E-mail enviado com sucesso!")
     except Exception as e:
-        print(f"Erro ao enviar e-mail: {e}")
+        print(f"[WARN] Erro ao enviar e-mail: {e}")
 
 def handler(request):
     usd, eur = get_exchange_rates_awesome()
@@ -109,14 +109,14 @@ def handler(request):
     }
         
     if usd is not None and eur is not None:
-        print(f"Cotações obtidas - USD: {usd}, EUR: {eur}")
+        print(f"[INFO] Cotações obtidas - USD: {usd}, EUR: {eur}")
         if usd < LIMIT_USD and eur < LIMIT_EUR:
             send_email(usd, eur)
             response["email_sent"] = True
         else:
-            print("Valores acima do limite.")
+            print("[INFO] Valores acima do limite.")
     else:
-        print("Não foi possível obter as cotações de nenhuma fonte.")
+        print("[WARN] Não foi possível obter as cotações de nenhuma fonte.")
 
     return {
         "statusCode": 200,
