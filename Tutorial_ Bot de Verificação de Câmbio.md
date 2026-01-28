@@ -4,7 +4,7 @@ Este bot monitora as cotações do Dólar e Euro e envia um alerta por e-mail ca
 
 ## Estrutura do Projeto
 
-- `api/check.py`: Script principal que realiza a consulta e envia o e-mail.
+- `api/index.py`: Script principal que realiza a consulta e envia o e-mail.
 - `vercel.json`: Configuração para deploy na Vercel e agendamento do Cron Job.
 - `requirements.txt`: Dependências do projeto.
 
@@ -28,7 +28,7 @@ Para que o bot consiga enviar e-mails, você deve configurar as seguintes variá
 
 ### 4. Execução Manual
 ```bash
-python api/check.py
+python api/index.py
 ```
 
 ## Deploy na Vercel

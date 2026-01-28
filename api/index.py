@@ -97,6 +97,7 @@ def send_email(usd, eur):
         print(f"[WARN] Erro ao enviar e-mail: {e}")
 
 def handler(request):
+    print("[INFO] Iniciando consulta.")
     usd, eur = get_exchange_rates_awesome()
     
     if usd is None or eur is None:
