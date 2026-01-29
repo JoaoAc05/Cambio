@@ -94,35 +94,37 @@ def send_email(usd, eur):
     except Exception as e:
         print(f"[WARN] Erro ao enviar e-mail: {e}")
 
-def handler(request, response):
-    print("[INFO] Iniciando consulta.")
-    usd, eur = get_exchange_rates_awesome()
-    
-    if usd is None or eur is None:
-        usd, eur = get_exchange_rates_fallback()
-
-    email_sent = False
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        print("[INFO] Iniciando consulta.")
+        usd, eur = get_exchange_rates_awesome()
         
-    if usd is not None or eur is not None:
-        print(f"[INFO] Cotações obtidas - USD: {usd}, EUR: {eur}")
-        if usd < LIMIT_USD or eur < LIMIT_EUR:
-            send_email(usd, eur)
-            email_sent = True
+        if usd is None or eur is None:
+            usd, eur = get_exchange_rates_fallback()
+
+        email_sent = False
+            
+        if usd is not None or eur is not None:
+            print(f"[INFO] Cotações obtidas - USD: {usd}, EUR: {eur}")
+            if usd < LIMIT_USD or eur < LIMIT_EUR:
+                send_email(usd, eur)
+                email_sent = True
+            else:
+                print("[INFO] Valores acima do limite.")
         else:
-            print("[INFO] Valores acima do limite.")
-    else:
-        print("[WARN] Não foi possível obter as cotações.")
+            print("[WARN] Não foi possível obter as cotações.")
 
-    self.send_response(200)
-    self.send_header("Content-Type", "application/json")
-    self.end_headers()
+        response = {
+            "usd": usd,
+            "eur": eur,
+            "email_sent": email_sent
+        }
 
-    self.wfile.write(json.dumps({
-        "usd": usd,
-        "eur": eur,
-        "email_sent": email_sent
-    }).encode("utf-8"))
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(response).encode("utf-8"))
 
-if __name__ == "__main__":
-    # Para execução local
-    handler(None)
+# if __name__ == "__main__":
+#     # Para execução local
+#     handler(None)
