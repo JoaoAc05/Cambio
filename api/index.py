@@ -38,16 +38,13 @@ def get_exchange_rates_awesome():
         return None, None
 
 def get_exchange_rates_fallback():
-    print("[INFO] Tentando Fallback (Frankfurter API)...")
+    print("[INFO] Tentando Fallback...")
     url = "https://api.frankfurter.app/latest?from=USD,EUR&to=BRL"
+
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
-        # Frankfurter retorna rates em relação à base. Se pedimos from USD,EUR to BRL:
-        # Precisamos inverter se a base for BRL ou tratar conforme o retorno.
-        # Na Frankfurter, o padrão é base EUR. Vamos pedir base USD e EUR separadamente ou converter.
-        # Melhor: pedir base EUR para pegar EUR-BRL e base USD para pegar USD-BRL.
         
         # USD to BRL
         res_usd = requests.get("https://api.frankfurter.app/latest?from=USD&to=BRL", timeout=10)
@@ -109,9 +106,9 @@ def handler(request):
         "email_sent": False
     }
         
-    if usd is not None and eur is not None:
+    if usd is not None or eur is not None:
         print(f"[INFO] Cotações obtidas - USD: {usd}, EUR: {eur}")
-        if usd < LIMIT_USD and eur < LIMIT_EUR:
+        if usd < LIMIT_USD or eur < LIMIT_EUR:
             send_email(usd, eur)
             response["email_sent"] = True
         else:
@@ -125,6 +122,6 @@ def handler(request):
         "body": json.dumps(response)
     }
 
-if __name__ == "__main__":
-    # Para execução local
-    handler(None)
+# if __name__ == "__main__":
+#     # Para execução local
+#     handler(None)
