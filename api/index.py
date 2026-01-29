@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 import json
+from http.server import BaseHTTPRequestHandler
 
 load_dotenv() 
 
@@ -100,7 +101,7 @@ def handler(request, response):
     if usd is None or eur is None:
         usd, eur = get_exchange_rates_fallback()
 
-    email_sent: False
+    email_sent = False
         
     if usd is not None or eur is not None:
         print(f"[INFO] Cotações obtidas - USD: {usd}, EUR: {eur}")
@@ -112,14 +113,16 @@ def handler(request, response):
     else:
         print("[WARN] Não foi possível obter as cotações.")
 
-    response.status_code = 200
-    response.headers["Content-Type"] = "application/json"
-    response.write(json.dumps({
+    self.send_response(200)
+    self.send_header("Content-Type", "application/json")
+    self.end_headers()
+
+    self.wfile.write(json.dumps({
         "usd": usd,
         "eur": eur,
         "email_sent": email_sent
-    }))
+    }).encode("utf-8"))
 
-# if __name__ == "__main__":
-#     # Para execução local
-#     handler(None)
+if __name__ == "__main__":
+    # Para execução local
+    handler(None)
