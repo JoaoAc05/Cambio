@@ -93,34 +93,32 @@ def send_email(usd, eur):
     except Exception as e:
         print(f"[WARN] Erro ao enviar e-mail: {e}")
 
-def handler(request):
+def handler(request, response):
     print("[INFO] Iniciando consulta.")
     usd, eur = get_exchange_rates_awesome()
     
     if usd is None or eur is None:
         usd, eur = get_exchange_rates_fallback()
 
-    response = {
-        "usd": usd,
-        "eur": eur,
-        "email_sent": False
-    }
+    email_sent: False
         
     if usd is not None or eur is not None:
         print(f"[INFO] Cotações obtidas - USD: {usd}, EUR: {eur}")
         if usd < LIMIT_USD or eur < LIMIT_EUR:
             send_email(usd, eur)
-            response["email_sent"] = True
+            email_sent = True
         else:
             print("[INFO] Valores acima do limite.")
     else:
-        print("[WARN] Não foi possível obter as cotações de nenhuma fonte.")
+        print("[WARN] Não foi possível obter as cotações.")
 
-    return {
-        "statusCode": 200,
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps(response)
-    }
+    response.status_code = 200
+    response.headers["Content-Type"] = "application/json"
+    response.write(json.dumps({
+        "usd": usd,
+        "eur": eur,
+        "email_sent": email_sent
+    }))
 
 # if __name__ == "__main__":
 #     # Para execução local
